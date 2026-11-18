@@ -1,0 +1,19 @@
+SOURCE_SNAPSHOT_IDENTICAL 1316 files
+Python 3.12.16 (main, Nov  5 2026, 07:58:20) [GCC 14.2.0]
+pillow 13.0.0
+imagehash 4.3.2
+pyyaml 6.0.3
+pytest 9.2.0
+numpy 2.5.5
+scipy 1.18.1
+pywavelets 1.10.0
+pytest: 85 passed in 33.05s
+kết luận pipeline: Hold - Không còn lỗi bắt buộc, nhưng tỉ lệ cảnh báo đạt hoặc vượt ngưỡng.; Có 38/205 ảnh còn cảnh báo chưa được duyệt (18.5366%); ngưỡng Hold là 10.0000%.
+
+CẢNH BÁO: bỏ qua phần train (--no-train): phần train 15 điểm chấm riêng, làm sau khi có Colab
+
+0 lỗi, 1 cảnh báo
+
+CHECK_EXIT_CODE=0
+
+WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.

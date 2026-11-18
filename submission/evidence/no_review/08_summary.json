@@ -1,0 +1,19 @@
+{
+  "verdict": {
+    "decision": "Rework",
+    "n_errors": 6,
+    "n_warn_images": 112,
+    "n_images": 205,
+    "warn_ratio": 0.5463,
+    "reasons": [
+      "Còn 6 lỗi bắt buộc; cần sửa trước khi xuất dữ liệu.",
+      "Có 112/205 ảnh còn cảnh báo chưa được duyệt (54.6341%); ngưỡng Hold là 10.0000%."
+    ]
+  },
+  "reviewed": 0,
+  "budget": 0,
+  "seconds": 6.7,
+  "exported": null,
+  "config_sha1": "c13639f15b3e11b51864b00c08b651167b0a68b8",
+  "review_sim_sha1": "7988ca22827f780a7043a2300490e679a1697154"
+}

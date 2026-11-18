@@ -1,0 +1,8 @@
+pytest: 1 failed, 56 passed, 57 errors in 70.55s (0:01:10)
+kết luận pipeline: Hold - Không còn lỗi bắt buộc, nhưng tỉ lệ cảnh báo đạt hoặc vượt ngưỡng.; Có 38/205 ảnh còn cảnh báo chưa được duyệt (18.5366%); ngưỡng Hold là 10.0000%.
+
+CẢNH BÁO: bỏ qua phần train (--no-train): phần train 15 điểm chấm riêng, làm sau khi có Colab
+LỖI: pytest chưa xanh hết: 1 failed, 56 passed, 57 errors in 70.55s (0:01:10)
+
+1 lỗi, 1 cảnh báo
+CHECK_EXIT_CODE=1
