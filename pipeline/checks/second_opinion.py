@@ -40,5 +40,67 @@ from ..model_cache import get_preds  # noqa: F401
 
 
 def run(ds, cfg, preds=None):
-    # TODO
-    raise NotImplementedError("check second_opinion chưa làm")
+    if preds is None:
+        preds = get_preds(ds, cfg, "checker")
+    thresholds = cfg["second_opinion"]
+    issues = []
+
+    for image_path in ds.image_files():
+        stem = image_path.stem
+        if stem not in preds or not ds.label_path(stem).exists():
+            continue
+        labels = []
+        for line_no, text in ds.read_label_lines(stem) or []:
+            try:
+                label = parse_yolo_line(text)
+            except ValueError:
+                continue
+            if 0 <= label[0] < len(ds.classes):
+                labels.append((line_no, label))
+
+        size = ds.image_size(stem)
+        predictions = preds[stem]
+        for prediction in predictions:
+            cls, conf, x, y, w, h = prediction
+            if conf < thresholds["conf"] or size is None:
+                continue
+            if w * size[0] * h * size[1] < thresholds["min_area_px"]:
+                continue
+            box = (x, y, w, h)
+            candidates = [
+                (label[0], iou_xywh(box, label[1:]))
+                for _, label in labels
+                if iou_xywh(box, label[1:]) >= thresholds["iou_missing"]
+            ]
+            if not candidates:
+                issues.append(Issue("second_opinion", WARN, "POSSIBLE_MISSING", stem,
+                                    "Model phát hiện vật thể chưa có box nhãn khớp.", extra={"conf": conf}))
+                continue
+
+            same_class = [overlap for label_class, overlap in candidates if label_class == cls]
+            if same_class:
+                best_iou = max(same_class)
+                if best_iou < thresholds["iou_loose"]:
+                    issues.append(Issue("second_opinion", WARN, "POSSIBLE_LOOSE_BOX", stem,
+                                        "Box cùng lớp nhưng chồng lấp thấp với model.",
+                                        extra={"conf": conf, "iou": best_iou}))
+            else:
+                best_iou = max(overlap for _, overlap in candidates)
+                if best_iou >= thresholds["iou_match"]:
+                    issues.append(Issue("second_opinion", WARN, "POSSIBLE_WRONG_CLASS", stem,
+                                        "Box khớp vị trí nhưng lớp khác dự đoán model.",
+                                        extra={"conf": conf, "iou": best_iou}))
+
+        # FALSE_POS dùng ngưỡng riêng và không lọc diện tích dự đoán.
+        fp_predictions = [p for p in predictions if p[1] >= thresholds["fp_conf"]]
+        for line_no, label in labels:
+            best_iou = max(
+                (iou_xywh(label[1:], prediction[2:]) for prediction in fp_predictions),
+                default=0.0,
+            )
+            if best_iou < thresholds["iou_missing"]:
+                issues.append(Issue("second_opinion", WARN, "POSSIBLE_FALSE_POS", stem,
+                                    "Box nhãn không khớp dự đoán model đủ độ tin cậy.",
+                                    line=line_no, extra={"iou": best_iou}))
+
+    return issues
